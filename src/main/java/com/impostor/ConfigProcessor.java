@@ -39,15 +39,23 @@ public class ConfigProcessor {
         }
         System.out.println(path);
         System.out.println(original);
-        System.out.println("/path/123/hello/dasdas".matches(path));
+        Pattern.compile(path).matcher("/path/123/hello/dasdas");
+                //.
+//        Pattern.compile(path).matcher("/path/123/hello/dasdas").results()
+//                .forEach(result -> {
+//                    for (int i = 1; i <= result.groupCount(); i++) {
+//                        System.out.println(result.group(i));
+//                    }
+//                });
+//        System.out.println("/path/123/hello/dasdas".matches(path));
     }
 
     private static String dataTypeToRegexResolver(DataType dataType) {
         switch (dataType) {
             case NUMBER:
-                return "[0-9]+";
+                return "([0-9]+)";
             case STRING:
-                return "[0-9a-zA-Z.\\*_\\-]+";
+                return "([0-9a-zA-Z.\\*_\\-]+)";
             default:
                 throw new RuntimeException("Illegal data type");
         }

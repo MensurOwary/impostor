@@ -13,5 +13,6 @@ public class UrlPath {
     private final String literalUrl;
     private final String regexUrl;
     private Map<String, String> queryParams;
+    private Map<String, DataType> pathParams;
 
 }
