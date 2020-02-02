@@ -10,26 +10,29 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class HttpServer {
     private final ServerSocket serverSocket;
     private final AtomicBoolean stopped = new AtomicBoolean(false);
-    private BlockingQueue<ClientThread> threads;
+    private final int port;
+    private BlockingQueue<RequestExecutionThread> threads;
 
     public HttpServer(int port) throws IOException {
         this.serverSocket = new ServerSocket(port);
+        this.port = port;
         this.threads = new LinkedBlockingQueue<>();
     }
 
     public void start() throws IOException {
+        System.out.println("Server is listening on port "+port);
         while (!stopped.get()) {
             Socket acceptedConnection = serverSocket.accept();
-            final ClientThread clientThread = new ClientThread(acceptedConnection);
-            this.threads.add(clientThread);
-            clientThread.start();
+            final RequestExecutionThread requestExecutionThread = new RequestExecutionThread(acceptedConnection);
+            this.threads.add(requestExecutionThread);
+            requestExecutionThread.start();
         }
     }
 
     public void stop() throws IOException {
         stopped.set(true);
 
-        for (ClientThread thread : threads) {
+        for (RequestExecutionThread thread : threads) {
             thread.stopExecution();
         }
 

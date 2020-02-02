@@ -7,7 +7,17 @@ public class Application {
 
     @SneakyThrows
     public static void main(String[] args) {
-        final int port = 8181;
+        int port = 8181;
+        String configUrl = null;
+        for (String arg : args) {
+            if (arg.trim().startsWith("--port=")) {
+                final String portCandidate = arg.replace("--port=", "");
+                port = Integer.parseInt(portCandidate);
+            } else if (arg.trim().startsWith("--config=")) {
+                configUrl = arg.replace("--config=", "");
+            }
+        }
+        ConfigProcessor.initialize(configUrl);
         final HttpServer httpServer = new HttpServer(port);
         httpServer.start();
         Runtime.getRuntime().addShutdownHook(new ShutdownThread(httpServer));

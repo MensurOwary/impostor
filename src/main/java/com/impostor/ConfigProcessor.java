@@ -5,10 +5,11 @@ import com.impostor.model.Endpoints;
 import com.impostor.model.config.Endpoint;
 import com.impostor.model.config.EndpointsConfig;
 import com.impostor.model.config.UrlPath;
+import lombok.SneakyThrows;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 
-import java.io.InputStream;
+import java.io.FileInputStream;
 import java.util.*;
 import java.util.regex.MatchResult;
 import java.util.regex.Pattern;
@@ -16,10 +17,19 @@ import java.util.stream.Collectors;
 
 public class ConfigProcessor {
     private final static Pattern PATH_VARIABLE_PATTERN = Pattern.compile("(\\{\\w+:?\\w+?})");
-    public final static Endpoints ENDPOINTS_CONFIG = getEndpoints();
+    private static Endpoints ENDPOINTS_CONFIG;
 
-    private static Endpoints getEndpoints() {
-        final EndpointsConfig endpointsConfig = process();
+    static void initialize(String configUrl) {
+        if (configUrl == null) throw new IllegalArgumentException("Configuration path is null");
+        ENDPOINTS_CONFIG = setEndpoints(configUrl);
+    }
+
+    public static Endpoints getEndpoints() {
+        return ENDPOINTS_CONFIG;
+    }
+
+    private static Endpoints setEndpoints(String configUrl) {
+        final EndpointsConfig endpointsConfig = loadConfiguration(configUrl);
         final List<Endpoint> endpoints = endpointsConfig.getEndpoints()
                 .stream()
                 .map(endpoint -> {
@@ -32,12 +42,10 @@ public class ConfigProcessor {
         return new Endpoints(endpoints);
     }
 
-    private static EndpointsConfig process() {
+    @SneakyThrows
+    private static EndpointsConfig loadConfiguration(String configUrl) {
         final Yaml yaml = new Yaml(new Constructor(EndpointsConfig.class));
-        final InputStream inputStream = ConfigProcessor.class
-                .getClassLoader()
-                .getResourceAsStream("config.yml");
-        return yaml.load(inputStream);
+        return yaml.load(new FileInputStream(configUrl));
     }
 
     private static UrlPath pathResolver(String originalUrl) {
@@ -55,10 +63,6 @@ public class ConfigProcessor {
             pathVariables.put(pathVariable, dataType);
         }
         return new UrlPath(originalUrl, regexUrl, pathVariables);
-    }
-
-    public static void main(String[] args) {
-        System.out.println(getEndpoints());
     }
 
 }

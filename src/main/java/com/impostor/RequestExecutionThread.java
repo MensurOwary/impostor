@@ -18,16 +18,15 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import static com.impostor.ConfigProcessor.ENDPOINTS_CONFIG;
 import static com.impostor.utils.UtilityKt.isValidRequestLine;
 
-public class ClientThread extends Thread {
+public class RequestExecutionThread extends Thread {
     private final Socket socket;
     private final Map<String, String> requestHeaders;
 
     private final AtomicBoolean stopped;
 
-    public ClientThread(Socket socket) {
+    public RequestExecutionThread(Socket socket) {
         this.socket = socket;
         this.requestHeaders = new HashMap<>();
         this.stopped = new AtomicBoolean(false);
@@ -41,7 +40,8 @@ public class ClientThread extends Thread {
             RequestLine requestLine = getRequestLine(in);
             try {
                 if (requestLine != null) {
-                    final var maybeEndpoint = ENDPOINTS_CONFIG.getEndpoint(requestLine.getUri());
+                    System.out.printf("Received:\t\t%s\t\t%s\n", requestLine.getMethod(), requestLine.getUri());
+                    final var maybeEndpoint = ConfigProcessor.getEndpoints().getEndpoint(requestLine.getUri());
                     if (maybeEndpoint.isPresent()) {
                         final var endpoint = maybeEndpoint.get();
                         final Map<String, String> pathValues = extractPathParamValues(requestLine, endpoint);
