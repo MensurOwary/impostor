@@ -1,7 +1,13 @@
 package com.impostor.model;
 
-public enum DataType {
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
-    STRING, NUMBER
+@Getter
+@RequiredArgsConstructor
+public enum DataType {
+    NUMBER("([0-9]+)"), STRING("([0-9a-zA-Z.\\*_\\-]+)");
+
+    private final String regex;
 
 }

@@ -10,7 +10,7 @@ public class RequestLine {
 
     private HttpMethod method;
     private String uri;
-    private String path;
+    private String protocol;
 
     public static RequestLine getRequestLine(String requestLine) {
         final String[] segments = requestLine.split("\\s+");
@@ -23,7 +23,6 @@ public class RequestLine {
         return new RequestLine(method, uri, protocol);
     }
 
-    public enum HttpMethod {
-        GET, POST, PUT, DELETE, HEAD, OPTIONS
-    }
+
+
 }

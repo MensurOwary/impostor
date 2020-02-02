@@ -1,9 +1,10 @@
 endpoints:
-  - path: /hello
+  - path: /hello/{id:number}/hi/{e:string}/uu
     contentType: application/json
+    method: post
     payload: '{
                   "glossary": {
-                      "title": "example glossary",
+                      "title": "example - ${id} - ${e} glossary",
               		"GlossDiv": {
                           "title": "S",
               			"GlossList": {
@@ -32,3 +33,9 @@ endpoints:
                 <heading>Reminder</heading>
                 <body>Don''t forget me this weekend!</body>
                </note>'
+  - path: /html
+    contentType: text/html
+    payload: '
+      <h1>This is a big heading</h1>
+      <img src="https://images.pexels.com/photos/1108099/pexels-photo-1108099.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500" />
+    '

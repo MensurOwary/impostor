@@ -3,29 +3,37 @@ package com.impostor;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class HttpServer {
-    private ServerSocket serverSocket;
-    private boolean stopped = false;
+    private final ServerSocket serverSocket;
+    private final AtomicBoolean stopped = new AtomicBoolean(false);
+    private BlockingQueue<ClientThread> threads;
 
-    public HttpServer() throws IOException {
-        this.serverSocket = new ServerSocket(8181);
+    public HttpServer(int port) throws IOException {
+        this.serverSocket = new ServerSocket(port);
+        this.threads = new LinkedBlockingQueue<>();
     }
 
     public void start() throws IOException {
-        while (!stopped) {
+        while (!stopped.get()) {
             Socket acceptedConnection = serverSocket.accept();
-            new ClientThread(acceptedConnection).start();
+            final ClientThread clientThread = new ClientThread(acceptedConnection);
+            this.threads.add(clientThread);
+            clientThread.start();
         }
     }
 
     public void stop() throws IOException {
-        stopped = true;
+        stopped.set(true);
+
+        for (ClientThread thread : threads) {
+            thread.stopExecution();
+        }
+
         serverSocket.close();
+        System.out.println("Server socket closed...");
     }
-
-    public static void main(String[] args) throws IOException {
-        new HttpServer().start();
-    }
-
 }

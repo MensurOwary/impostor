@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 public class EndpointConfig {
 
     private String path;
+    private String method;
     private String contentType;
     private String payload;
 
